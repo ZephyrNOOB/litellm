@@ -1,0 +1,58 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+# The bundled dashboard lives at /litellm/proxy/_experimental/out but its HTML
+# references assets at /litellm-asset-prefix/_next/* (see next.config.mjs
+# assetPrefix and proxy_server.py). Rewrite those to the real files.
+[[redirects]]
+  from = "/litellm-asset-prefix/_next/*"
+  to = "/litellm/proxy/_experimental/out/_next/:splat"
+  status = 200
+
+# Friendly entry points into the bundled dashboard.
+[[redirects]]
+  from = "/dashboard"
+  to = "/litellm/proxy/_experimental/out/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/litellm/proxy/_experimental/out/login/index.html"
+  status = 200
+
+# Pretty URLs for every exported dashboard page, e.g. /logs -> .../logs/index.html.
+# File matches take precedence over this rule, so real files at the repo root stay served.
+[[redirects]]
+  from = "/*"
+  to = "/litellm/proxy/_experimental/out/:splat/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/litellm/proxy/_experimental/out/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/litellm-asset-prefix/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
