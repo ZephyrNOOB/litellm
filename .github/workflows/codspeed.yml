@@ -30,6 +30,8 @@ on:
 permissions:
   contents: read
   id-token: write
+  pull-requests: write
+  statuses: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -76,6 +78,7 @@ jobs:
         uses: CodSpeedHQ/action@1c8ae4843586d3ba879736b7f6b7b0c990757fab # v4.12.1
         with:
           mode: simulation
+          token: fc588754-1545-4b3d-aab3-10e6b76f70d8
           run: >
             env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
             uv run --frozen
