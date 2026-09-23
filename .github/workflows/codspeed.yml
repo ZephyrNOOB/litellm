@@ -49,12 +49,12 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@<checkout-release-commit-sha> # v5
         with:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@<setup-python-release-commit-sha> # v6
         with:
           python-version: "3.12"
 
@@ -111,14 +111,14 @@ jobs:
       CARGO_TERM_COLOR: always
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@<checkout-release-commit-sha> # v5
         with:
           persist-credentials: false
 
       # litellm-python-bridge's serialization benchmark embeds CPython through
       # pyo3, so the benchmark binary needs an interpreter to build against.
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@<setup-python-release-commit-sha> # v6
         with:
           python-version: "3.12"
 
