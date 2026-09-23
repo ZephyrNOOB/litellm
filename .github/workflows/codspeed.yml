@@ -25,8 +25,6 @@ on:
       - ".github/workflows/codspeed.yml"
       - ".github/actions/setup-uv-with-retries/**"
       - ".github/actions/cache-cargo-build/**"
-  # Allow CodSpeed to trigger backtest performance analysis
-  # in order to generate initial data
   workflow_dispatch:
 
 permissions:
@@ -60,13 +58,10 @@ jobs:
       - name: Cache the Rust build
         uses: ./.github/actions/cache-cargo-build
 
-      # Build the wheel and resolve every dependency outside the CodSpeed
-      # runner: the same maturin build took 42 minutes inside `codspeed run`
-      # versus under 3 minutes as a plain step (LIT-6183)
       - name: Build environment
         run: >
           env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
-          uv run --frozen --no-default-groups
+          uv run --frozen
           --with pytest==8.3.5
           --with pytest-codspeed==4.3.0
           --with "mcp>=2.2.0,<3.0"
@@ -83,7 +78,7 @@ jobs:
           mode: simulation
           run: >
             env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
-            uv run --frozen --no-default-groups
+            uv run --frozen
             --with pytest==8.3.5
             --with pytest-codspeed==4.3.0
             --with "mcp>=2.2.0,<3.0"
