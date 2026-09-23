@@ -66,7 +66,10 @@ strum = { version = "0.28.0", features = ["derive"] }
 url = "2.5.8"
 webpki-roots = "1"
 time = { version = "0.3.53", features = ["parsing"] }
-criterion = "0.8.2"
+# CodSpeed's drop-in replacement for criterion. It keeps the criterion API and
+# its walltime harness for local `cargo bench`, and switches to CodSpeed's
+# instrumented harness under `cargo codspeed run` (.github/workflows/codspeed.yml).
+criterion = { package = "codspeed-criterion-compat", version = "5.0.2" }
 fancy-regex = "0.19.2"
 veil = "0.3.0"
 

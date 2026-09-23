@@ -138,6 +138,37 @@ make install-test-deps
 
 This syncs the locked test environment used across the repo, including `psycopg` v3 plus `psycopg-binary` (used by `pytest-postgresql`), `psycopg2-binary` (used by some proxy E2E tests), and a generated Prisma client for DB-backed proxy tests, so pytest startup matches CI without manual package installs.
 
+### Running Performance Benchmarks
+
+Performance is tracked continuously with [CodSpeed](https://codspeed.io) (`.github/workflows/codspeed.yml`). Every push and PR that touches `litellm/`, `litellm-rust/` or `tests/benchmarks/` is measured and compared against the base commit.
+
+Two suites are measured:
+
+- **Python** — `tests/benchmarks/`, driven by `pytest-codspeed`, covering token counting, model/provider resolution, cost calculation, the completion path and the MCP/A2A transforms.
+- **Rust** — the criterion suites in `litellm-rust`: `litellm-token-counter`'s `token_counter` (byte-level fast path vs. the full encoder) and `litellm-python-bridge`'s `serialization` (the pyo3 payload conversions).
+
+Run the Python suite locally:
+
+```bash
+uv run --no-default-groups --with pytest-codspeed --with "mcp>=2.2.0,<3.0" --with "a2a-sdk>=1.1.0,<2.0" pytest tests/benchmarks/ --codspeed
+```
+
+Run the Rust suites locally with plain criterion (no CodSpeed needed):
+
+```bash
+cd litellm-rust
+cargo bench -p litellm-token-counter --bench token_counter
+cargo bench -p litellm-python-bridge --bench serialization
+```
+
+`criterion` is aliased to `codspeed-criterion-compat` in `litellm-rust/Cargo.toml`, so the benches keep their criterion behaviour locally and switch to CodSpeed's instrumented harness when run through `cargo codspeed run`. To reproduce the CI measurement with the [CodSpeed CLI](https://codspeed.io/docs/cli):
+
+```bash
+cd litellm-rust
+cargo codspeed build -p litellm-token-counter -p litellm-python-bridge --bench token_counter --bench serialization
+codspeed run --mode simulation -- cargo codspeed run -p litellm-token-counter -p litellm-python-bridge --bench token_counter --bench serialization
+```
+
 ### Running Linting and Formatting Checks
 
 Run all linting checks (matches CI exactly):
