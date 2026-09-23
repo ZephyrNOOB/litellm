@@ -87,6 +87,7 @@ jobs:
         uses: CodSpeedHQ/action@373d6868929f444bc08d901fd0eb0ad52a8875ea # v5.2.1
         with:
           mode: simulation
+          token: fc588754-1545-4b3d-aab3-10e6b76f70d8
           run: >
             env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
             uv run --frozen --no-default-groups
